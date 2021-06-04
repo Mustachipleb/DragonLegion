@@ -12,6 +12,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DragonLegion.Data.Repositories;
+using ReflectionIT.Mvc.Paging;
 using Serilog;
 
 namespace DragonLegion
@@ -29,17 +31,31 @@ namespace DragonLegion
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<ApplicationDbContext>(options =>
+            {
                 options.UseSqlServer(
-                    Configuration.GetConnectionString("DefaultConnection")));
+                    Configuration.GetConnectionString("DefaultConnection"));
+                options.EnableDetailedErrors();
+                options.EnableSensitiveDataLogging();
+            });
             services.AddDatabaseDeveloperPageExceptionFilter();
 
+            services.AddAutoMapper(typeof(ViewModelProfile));
+            
+            services.AddScoped<PostRepository>();
+            
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+            services.AddScoped<DbDataInitializer>();
             services.AddControllersWithViews();
+            services.AddPaging(opt =>
+            {
+                opt.ViewName = "Bootstrap4";
+                opt.PageParameterName = "page";
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DbDataInitializer dataInitializer)
         {
             if (env.IsDevelopment())
             {
@@ -53,6 +69,8 @@ namespace DragonLegion
                 app.UseHsts();
             }
 
+            dataInitializer.InitializeData();
+            
             app.UseSerilogRequestLogging();
             
             app.UseHttpsRedirection();

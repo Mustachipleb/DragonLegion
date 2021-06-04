@@ -1,0 +1,15 @@
+﻿@{
+    ViewData["Title"] = "Delete";
+}
+
+<h1>Delete Event</h1>
+
+<h3>Are you sure you want to delete @ViewData["name"]?</h3>
+<div>
+    
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="@ViewData["id"]" />
+        <input type="submit" value="Delete" class="btn btn-danger" /> |
+        <a asp-action="Index">Back to List</a>
+    </form>
+</div>

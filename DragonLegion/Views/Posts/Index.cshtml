@@ -1,0 +1,47 @@
+﻿@using Markdig
+@using ReflectionIT.Mvc.Paging
+@addTagHelper *, ReflectionIT.Mvc.Paging
+@model PagingList<DragonLegion.Models.ViewModels.PostViewModels.Index>
+
+@{
+    ViewData["Title"] = "Posts";
+    var pipeline = new MarkdownPipelineBuilder()
+        .UseBootstrap()
+        .Build();
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="row">
+            <nav aria-label="Post navigation" class="col-auto m-auto">
+                <vc:pager paging-list="@Model"></vc:pager>
+            </nav>
+        </div>
+    </div>
+    <div class="col-8">
+        @foreach (var post in Model)
+        {
+            <div class="mb-5">
+                <h3>@post.Title</h3>
+                @*<h6 class="text-muted">@post.Subtitle</h6>*@
+                <span>@post.CreationDate.ToString("f") | By <a asp-controller="Profiles" asp-action="Detail" asp-route-id="@post.AuthorId">@post.Author</a></span>
+                <hr />
+                @{
+                    var content = Markdown.ToHtml(post.Content, pipeline);
+                    content = content.Remove(content.Length - 5);
+                }
+                <div>@Html.Raw(content) <a asp-action="Details" asp-route-id="@post.Id">Read more...</a>@Html.Raw("</p>")</div>
+            </div>
+        }
+    </div>
+    <div class="col-4">
+        <partial name="~/Views/Shared/_DiscordEmbedPartial.cshtml"/>
+    </div>
+    <div class="col-12">
+        <div class="row">
+            <nav aria-label="Post navigation" class="col-auto m-auto">
+                <vc:pager paging-list="@Model" />
+            </nav>
+        </div>
+    </div>
+</div>

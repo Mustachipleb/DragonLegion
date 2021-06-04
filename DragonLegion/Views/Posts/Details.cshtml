@@ -1,0 +1,17 @@
+﻿@using Markdig
+@model DragonLegion.Models.ViewModels.PostViewModels.Detail
+
+@{
+    ViewData["Title"] = "Post";
+    var pipeline = new MarkdownPipelineBuilder().UseBootstrap().Build();
+}
+
+<div class="col-8">
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
+    <div>
+        <h3>@Model.Title</h3>
+        <h6 class="text-muted">@Model.Subtitle</h6>
+        <hr/>
+        <div>@Html.Raw(Markdown.ToHtml(Model.Content, pipeline))</div>
+    </div>
+</div>
